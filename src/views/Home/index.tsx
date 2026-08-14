@@ -1,7 +1,7 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { CustomButton } from "../../components";
-import { StackScreens } from "../../router";
+import { StackScreens } from "../../router/constants";
 
 export const HomeView = () => {
   const { navigate } = useNavigation();

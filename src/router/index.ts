@@ -1,12 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createStaticNavigation } from "@react-navigation/native";
 import { DefaultFlatListView, HomeView, OptimizedFlatListView } from "../views";
+import { StackScreens } from "./constants";
 
-export const StackScreens = {
-  Home: "Home",
-  DefaultFlatList: "DefaultFlatList",
-  OptimizedFlatList: "OptimizedFlatList",
-} as const;
 
 const MainStack = createNativeStackNavigator({
   initialRouteName: StackScreens.Home,

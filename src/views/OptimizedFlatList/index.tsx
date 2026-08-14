@@ -1,13 +1,21 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { OptimizedProductItemDto, ProductItemProps } from "../../utils/types";
 import { OptimizedProductItem } from "../../components";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
-const ITEM_HEIGHT = 278;
-const keyExtractor = (item: OptimizedProductItemDto) =>
-  `ProductItem-${item.id}`;
+const ITEM_HEIGHT = 278 + 16 + 2; // initialHeight + padding + borderWidth
+const LIMIT = 8;
+// const keyExtractor = (item: OptimizedProductItemDto, index: number) =>
+//   `ProductItem-${index}`;
+const keyExtractor = (item: OptimizedProductItemDto) => `ProductItem-${item.id}`
 
-export const OptimizedFlatListView: React.FC = () => {
+const getItemLayout = (_, index: number) => ({
+          length: ITEM_HEIGHT,
+          offset: ITEM_HEIGHT * index,
+          index,
+        });
+
+export const OptimizedFlatListView: FC = () => {
   const [data, setData] = useState<OptimizedProductItemDto[]>([]);
   const [isLoading, setLoading] = useState(false);
   const [currentCount, setCurrentCount] = useState(0);
@@ -20,7 +28,7 @@ export const OptimizedFlatListView: React.FC = () => {
 
   useEffect(() => {
     async function prepare() {
-      const res = await fetch("https://dummyjson.com/products");
+      const res = await fetch(`https://dummyjson.com/products?limit=${LIMIT}`);
 
       const _data = await res.json();
 
@@ -69,13 +77,7 @@ export const OptimizedFlatListView: React.FC = () => {
 
   const renderHeaderComponent = useCallback(() => {
     return (
-      <View
-        style={{
-          alignItems: "center",
-          padding: 8,
-          backgroundColor: "#eee",
-        }}
-      >
+      <View style={styles.listHeaderContainer}>
         {count > 0 && currentCount > 0 && (
           <Text>
             Loaded {currentCount} of {count} items
@@ -103,7 +105,7 @@ export const OptimizedFlatListView: React.FC = () => {
 
     try {
       const res = await fetch(
-        `https://dummyjson.com/products?skip=${data.length}`,
+        `https://dummyjson.com/products?limit=${LIMIT}&skip=${data.length}`,
       );
 
       const _data = await res.json();
@@ -125,22 +127,20 @@ export const OptimizedFlatListView: React.FC = () => {
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         contentContainerStyle={styles.listContainer}
-        columnWrapperStyle={{ columnGap: 8 }}
+        columnWrapperStyle={styles.listColumnsContainer}
         numColumns={2}
         stickyHeaderIndices={[0]}
         ListHeaderComponent={renderHeaderComponent}
         ListFooterComponent={renderFooterComponent}
         onEndReached={handleOnEndReach}
         initialNumToRender={6}
-        windowSize={6 + 4 + 4}
-        getItemLayout={(_, index) => ({
-          length: ITEM_HEIGHT,
-          offset: ITEM_HEIGHT * index,
-          index,
-        })}
+        maxToRenderPerBatch={4}
+        
+        updateCellsBatchingPeriod={100}
+        windowSize={8}
+        getItemLayout={getItemLayout}
         onEndReachedThreshold={0.3}
-        maxToRenderPerBatch={6}
-        removeClippedSubviews
+        removeClippedSubviews={true}
       />
     </View>
   );
@@ -150,9 +150,19 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#eee",
   },
+  listHeaderContainer: {
+    alignItems: "center",
+    padding: 8,
+    backgroundColor: "#eee",
+  },
   listContainer: {
     rowGap: 8,
+    columnGap: 8,
     padding: 8,
+    backgroundColor: '#eee'
+  },
+  listColumnsContainer: {
+    columnGap: 8
   },
   buttonText: {
     color: "#fff",
