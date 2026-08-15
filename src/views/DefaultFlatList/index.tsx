@@ -30,8 +30,7 @@ export const DefaultFlatListView: React.FC = () => {
   const handleAddToCart = (id: number) => {
     setCart((prev) => {
       if (prev.includes(id)) {
-        prev.splice(prev.indexOf(id));
-        return prev;
+        return prev.filter(p => p !== id);
       }
 
       return prev.concat(id);
@@ -91,7 +90,8 @@ export const DefaultFlatListView: React.FC = () => {
           setData((prev) => prev.concat(products));
           setLoading(false);
         }}
-        onEndReachedThreshold={0.25}
+        onEndReachedThreshold={0.3}
+        overScrollMode="never"
       />
     </View>
   );

@@ -1,25 +1,22 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { OptimizedProductItemDto, ProductItemProps } from "../../utils/types";
 import { OptimizedProductItem } from "../../components";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 
 const ITEM_HEIGHT = 278 + 16 + 2; // initialHeight + padding + borderWidth
-const LIMIT = 8;
+const LIMIT = 16;
 
-const keyExtractor = (item: OptimizedProductItemDto, index: number) => `ProductItem-${item.id}-${index}}`
+const keyExtractor = (item: OptimizedProductItemDto) => `ProductItem-${item.id}`
 
-const getItemLayout = (_, index: number) => ({
-  length: ITEM_HEIGHT,
-  offset: ITEM_HEIGHT * index,
-  index,
-});
-
-export const OptimizedFlatListView: FC = () => {
+export const FlashListView: FC = () => {
   const [data, setData] = useState<OptimizedProductItemDto[]>([]);
   const [isLoading, setLoading] = useState(false);
   const [currentCount, setCurrentCount] = useState(0);
   const [count, setCount] = useState(-1);
   const [cart, setCart] = useState<Set<number>>(new Set());
+
+  const cartSet = useMemo(() => new Set(cart), [cart]);
 
   const isFetchingRef = useRef(false);
 
@@ -28,9 +25,10 @@ export const OptimizedFlatListView: FC = () => {
       const res = await fetch(`https://dummyjson.com/products?limit=${LIMIT}`);
 
       const _data = await res.json();
+      const { total, products } = _data;
 
-      const { total } = _data;
       setCount(total);
+      setData(products);
     }
 
     prepare();
@@ -64,12 +62,12 @@ export const OptimizedFlatListView: FC = () => {
           rating={item.rating}
           price={item.price}
           availabilityStatus={item.availabilityStatus}
-          isInCart={cart.has(item.id)}
+          isInCart={cartSet.has(item.id)}
           onAddToCart={handleAddToCart}
         />
       );
     },
-    [cart, handleAddToCart],
+    [cartSet, handleAddToCart],
   );
 
   const renderHeaderComponent = useCallback(() => {
@@ -119,26 +117,19 @@ export const OptimizedFlatListView: FC = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
+      {renderHeaderComponent()}
+      <FlashList
         data={data}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         contentContainerStyle={styles.listContainer}
         columnWrapperStyle={styles.listColumnsContainer}
         numColumns={2}
-        stickyHeaderIndices={[0]}
-        ListHeaderComponent={renderHeaderComponent}
         ListFooterComponent={renderFooterComponent}
         onEndReached={handleOnEndReach}
-        onEndReachedThreshold={0.3}
+        onEndReachedThreshold={0.4}
 
-        initialNumToRender={6}
-        maxToRenderPerBatch={4}
-        updateCellsBatchingPeriod={100}
-        windowSize={8}
-        getItemLayout={getItemLayout}
-        removeClippedSubviews={true}
-        bounces={false}
+        estimatedItemSize={ITEM_HEIGHT}
         overScrollMode="never"
       />
     </View>
@@ -148,6 +139,7 @@ export const OptimizedFlatListView: FC = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#eee",
+    flex: 1
   },
   listHeaderContainer: {
     alignItems: "center",
@@ -158,7 +150,7 @@ const styles = StyleSheet.create({
     rowGap: 8,
     columnGap: 8,
     padding: 8,
-    backgroundColor: '#eee'
+    backgroundColor: '#eee',
   },
   listColumnsContainer: {
     columnGap: 8

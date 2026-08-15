@@ -4,7 +4,6 @@ import { CustomButton } from "./CustomButton";
 import { memo } from "react";
 import { Image } from "expo-image";
 
-
 const ITEM_WIDTH = Dimensions.get("window").width / 2 - 16 * 2;
 const ITEM_HEIGHT = ITEM_WIDTH;
 

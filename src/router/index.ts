@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createStaticNavigation } from "@react-navigation/native";
 import { DefaultFlatListView, HomeView, OptimizedFlatListView } from "../views";
 import { StackScreens } from "./constants";
+import { FlashListView } from "../views/FlashList";
 
 
 const MainStack = createNativeStackNavigator({
@@ -16,14 +17,21 @@ const MainStack = createNativeStackNavigator({
     [StackScreens.DefaultFlatList]: {
       screen: DefaultFlatListView,
       options: {
-        title: "Default FlatList",
+        title: "Products",
         headerBackButtonDisplayMode: "minimal",
       },
     },
     [StackScreens.OptimizedFlatList]: {
       screen: OptimizedFlatListView,
       options: {
-        title: "Optimized FlatList",
+        title: "Products",
+        headerBackButtonDisplayMode: "minimal",
+      },
+    },
+    [StackScreens.FlashList]: {
+      screen: FlashListView,
+      options: {
+        title: "Products",
         headerBackButtonDisplayMode: "minimal",
       },
     },

@@ -18,12 +18,16 @@ export const HomeView = () => {
       }}
     >
       <CustomButton
-        title="Show default FlatList"
+        title="Default List"
         onPress={() => navigate(StackScreens.DefaultFlatList)}
       />
       <CustomButton
-        title="Show optimized FlatList"
+        title="Better List"
         onPress={() => navigate(StackScreens.OptimizedFlatList)}
+      />
+      <CustomButton
+        title="Fully Optimized List"
+        onPress={() => navigate(StackScreens.FlashList)}
       />
     </SafeAreaView>
   );
